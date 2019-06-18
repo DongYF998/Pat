@@ -1,0 +1,33 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.patest.dao.UserDao">
+    <select id="queryAll" timeout="2000" resultType="User">
+        select * from user
+    </select>
+
+    <!-- 判断username 是否被注册 -->
+    <select id="isUsernameExist" parameterType="String" resultType="int" timeout="2000">
+        select count(*)
+        from user
+        where username = #{username}
+    </select>
+
+    <!-- 通过Username 查询User -->
+    <select id="queryUserByUsername" resultType="User" parameterType="String" timeout="2000">
+        select uid, username, password, email, phone, role, school
+        from user
+        where username = #{username}
+    </select>
+
+    <!--  通过id 查询User -->
+    <select id="queryUserById" resultType="User" parameterType="int" timeout="2000">
+        select * from user where uid = #{uid}
+    </select>
+
+    <!-- 插入User -->
+    <insert id="insertUser" useGeneratedKeys="true" parameterType="User">
+        insert into user(username, password, email, phone, school, role)
+        values (#{username}, #{password}, #{email}, #{phone}, #{school}, #{role})
+    </insert>
+</mapper>

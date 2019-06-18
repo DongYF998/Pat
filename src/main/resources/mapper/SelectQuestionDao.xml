@@ -1,0 +1,13 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.patest.dao.SelectQuestionDao">
+    <select id="queryAll" resultType="SelectQuestion" timeout="2000">
+        select * from select_question;
+    </select>
+
+    <insert id="insertSelectQuestion" parameterType="SelectQuestion" useGeneratedKeys="true" timeout="2000">
+        insert into select_question(uid, title, answer_a, answer_b, answer_c, answer_d, answer, level, score, tag)
+        values (#{uid},#{title},#{answerA},#{answerB},#{answerC},#{answerD},#{answer},#{level},#{score},#{tag});
+    </insert>
+</mapper>
