@@ -10,4 +10,5 @@ public interface UserService {
     User login(String username, String password) throws UserException;
 
     int register(User user) throws UserException;
+
 }

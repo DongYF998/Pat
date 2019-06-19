@@ -10,6 +10,8 @@ import com.app.patest.service.SelectQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @ClassName: SelectQuestionServiceImpl
  * @Author: Yangyang
@@ -36,5 +38,10 @@ public class SelectQuestionServiceImpl implements SelectQuestionService {
             return code;
         }
         return 0;
+    }
+
+    @Override
+    public List<SelectQuestion> queryAll() {
+        return questionDao.queryAll();
     }
 }

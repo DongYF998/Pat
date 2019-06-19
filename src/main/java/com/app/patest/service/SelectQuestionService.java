@@ -3,6 +3,8 @@ package com.app.patest.service;
 import com.app.patest.common.exception.UserException;
 import com.app.patest.entity.SelectQuestion;
 
+import java.util.List;
+
 /**
  * @ClassName: SelectQuestionService
  * @Author: Yangyang
@@ -12,4 +14,6 @@ import com.app.patest.entity.SelectQuestion;
 public interface SelectQuestionService {
 
     int InsertQuestion(SelectQuestion question) throws UserException;
+
+    List<SelectQuestion> queryAll();
 }

@@ -31,10 +31,13 @@ public class RedisUtil {
             template.opsForValue().set("token:"+key,value,timeout,TimeUnit.MILLISECONDS);
             return true;
         }catch (Exception e){
-            if(e instanceof RedisConnectionFailureException)
+            if(e instanceof RedisConnectionFailureException) {
+                e.printStackTrace();
                 throw new UserException(CommonExceptionEnum.REDIS_SERVER_ERR);
-            else
+            }else{
+                e.printStackTrace();
                 throw e;
+            }
         }
     }
 

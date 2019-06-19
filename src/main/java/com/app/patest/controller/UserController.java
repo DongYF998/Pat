@@ -55,6 +55,7 @@ public class UserController extends BaseController{
         redisUtil.setTokenWithTimeOut(user.getUsername(),token,1000*60*60*2);
         Map<String,Object> data = new HashMap<>();
         data.put("token",token);
+        data.put("user",userView);
         return new CommonReturnType(data);
     }
 
@@ -78,5 +79,11 @@ public class UserController extends BaseController{
     @GetMapping("/test")
     public String test(){
         return "通过教师认证";
+    }
+
+    @PassToken
+    @GetMapping("/testServer")
+    public CommonReturnType testService(){
+        return new CommonReturnType();
     }
 }
