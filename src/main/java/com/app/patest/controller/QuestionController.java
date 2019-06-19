@@ -11,10 +11,7 @@ import com.app.patest.service.SelectQuestionService;
 import com.app.patest.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,5 +48,8 @@ public class QuestionController {
         return new CommonReturnType("上传成功");
     }
 
-
+    @GetMapping("/queryAll")
+    public CommonReturnType queryAll(){
+        return new CommonReturnType(questionService.queryAll());
+    }
 }
