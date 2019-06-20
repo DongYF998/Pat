@@ -1,5 +1,6 @@
 package com.app.patest.intercepter;
 
+import com.app.patest.annotation.AdminToken;
 import com.app.patest.annotation.PassToken;
 import com.app.patest.annotation.TeacherToken;
 import com.app.patest.annotation.UserToken;
@@ -60,43 +61,30 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             }
         }
 
-        //验证教师接口@Teacher
+        //验证管理员接口@AdminToken
+        if(method.isAnnotationPresent(AdminToken.class)){
+            AdminToken adminToken = method.getAnnotation(AdminToken.class);
+            if(adminToken.required()){
+                String username = JWT.decode(token).getAudience().get(0);
+                User user = userDao.queryUserByUsername(username);
+                if(user.getRole() != 2){
+                    throw new UserException(CommonExceptionEnum.NO_TEACHER_PERMISSION);
+                }
+                return handler(token);
+            }
+        }
+
+        //验证教师接口@TeacherToken
         if(method.isAnnotationPresent(TeacherToken.class)){
             TeacherToken teacherToken = method.getAnnotation(TeacherToken.class);
             if(teacherToken.required()){
                 //验证Token有效性
-                if(token==null||token.equals(""))
-                    throw new UserException(CommonExceptionEnum.NO_PERMISSION);
-
-                //验证用户名
-                String username = tokenUtil.getUsername(token);
-                if(userDao.isUsernameExist(username) == 0)
-                    throw new UserException(CommonExceptionEnum.USER_NOT_EXIST);
-
-                //验证Token时效性
-                if(redisUtil.getToken(username) == null)
-                    throw new UserException(CommonExceptionEnum.TIME_OUT);
-                if(!redisUtil.getToken(username).equals(token))
-                    throw new UserException(CommonExceptionEnum.VERIFY_OUTTIME);
-
-
+                String username = JWT.decode(token).getAudience().get(0);
                 User user = userDao.queryUserByUsername(username);
-                if(user.getRole() != 1){
+                if(user.getRole() == 0){
                     throw new UserException(CommonExceptionEnum.NO_TEACHER_PERMISSION);
                 }
-                JWTVerifier verifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
-
-
-                //验证token有效性
-                try {
-                    verifier.verify(token);
-                }catch (JWTVerificationException e){
-                    throw new UserException(CommonExceptionEnum.ILLEGAL_USER);
-                }
-
-                //重新设置验证有效时间
-                redisUtil.setTokenWithTimeOut(username,token,1000*60*60*2);
-                return true;
+                return handler(token);
             }
         }
 
@@ -104,34 +92,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         if(method.isAnnotationPresent(UserToken.class)){
             UserToken userToken = method.getAnnotation(UserToken.class);
             if(userToken.required()){
-                //验证Token有效性
-                if(token==null||token.equals(""))
-                    throw new UserException(CommonExceptionEnum.NO_PERMISSION);
-
-                //验证用户名
-                String username = tokenUtil.getUsername(token);
-                if(userDao.isUsernameExist(username) == 0)
-                    throw new UserException(CommonExceptionEnum.USER_NOT_EXIST);
-
-                //验证Token时效性
-                if(redisUtil.getToken(username) == null)
-                    throw new UserException(CommonExceptionEnum.TIME_OUT);
-                if(!redisUtil.getToken(username).equals(token))
-                    throw new UserException(CommonExceptionEnum.VERIFY_OUTTIME);
-
-                User user = userDao.queryUserByUsername(username);
-                JWTVerifier verifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
-
-                //验证token有效性
-                try {
-                    verifier.verify(token);
-                }catch (JWTVerificationException e){
-                    throw new UserException(CommonExceptionEnum.ILLEGAL_USER);
-                }
-
-                //重新设置验证有效时间
-                redisUtil.setTokenWithTimeOut(username,token,1000*60*60*2);
-                return true;
+                return handler(token);
             }
         }
 
@@ -145,6 +106,34 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    }
 
+    public boolean handler(String token) throws Exception {
+        if(token==null||token.equals(""))
+            throw new UserException(CommonExceptionEnum.NO_PERMISSION);
+
+        //验证用户名
+        String username = tokenUtil.getUsername(token);
+        if(userDao.isUsernameExist(username) == 0)
+            throw new UserException(CommonExceptionEnum.USER_NOT_EXIST);
+
+        //验证Token时效性
+        if(redisUtil.getToken(username) == null)
+            throw new UserException(CommonExceptionEnum.TIME_OUT);
+        if(!redisUtil.getToken(username).equals(token))
+            throw new UserException(CommonExceptionEnum.VERIFY_OUTTIME);
+
+        User user = userDao.queryUserByUsername(username);
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
+
+        //验证token有效性
+        try {
+            verifier.verify(token);
+        }catch (JWTVerificationException e){
+            throw new UserException(CommonExceptionEnum.ILLEGAL_USER);
+        }
+        //重新设置验证有效时间
+        redisUtil.setTokenWithTimeOut(username,token,1000*60*60*2);
+        return true;
     }
 }

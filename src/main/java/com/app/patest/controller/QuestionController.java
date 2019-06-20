@@ -1,5 +1,6 @@
 package com.app.patest.controller;
 
+import com.app.patest.annotation.PassToken;
 import com.app.patest.annotation.TeacherToken;
 import com.app.patest.common.exception.CommonExceptionEnum;
 import com.app.patest.common.exception.UserException;
@@ -48,6 +49,9 @@ public class QuestionController {
         return new CommonReturnType("上传成功");
     }
 
+
+
+    @PassToken
     @GetMapping("/queryAll")
     public CommonReturnType queryAll(){
         return new CommonReturnType(questionService.queryAll());
